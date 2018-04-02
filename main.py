@@ -1,4 +1,4 @@
-import gui
+import component
 
-main = gui.board()
+main = component.game()
 main.run()

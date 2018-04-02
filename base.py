@@ -7,8 +7,29 @@ board_rect = board_img.get_rect()
 black_rect = black_img.get_rect()
 white_rect = white_img.get_rect()
 
+pygame.init()
+clock = pygame.time.Clock()
 pygame.display.set_caption('Reversi')
 
 cell_width, cell_height = 50, 50
-piece_width, piece_height = 48, 48
-board_x, board_y = 40, 38
+piece_width, piece_height = 49, 48
+board_x, board_y = 39, 38
+
+black = "black"
+white = "white"
+none = "none"
+
+man = "man"
+ai = "ai"
+
+total_start, total_end = 0, 0
+
+basicFont = pygame.font.Font('./assets/SourceHanSans-Regular.otf', 30)
+promptFont = pygame.font.Font('./assets/SourceHanSans-Regular.otf', 20)
+fontBlackColor = (0, 0, 0)
+fontWhiteColor = (255, 255, 255)
+fontBgColor = (255, 255, 255)
+
+direction = [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+init_valid = [(2, 4), (3, 5), (4, 2), (5, 3)]
+init_count = [1, 1, 1, 1]
