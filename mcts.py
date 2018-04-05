@@ -13,7 +13,10 @@ import base
 from math import sqrt,log
 
 
-
+'''
+montecarlo class 传的参数中的game的player 为要下棋的选手
+UCTSearch 返回 下一步的最好的棋布
+'''
 class MonteCarlo(object):
     def __init__(self,game):
         self.game=game#传的game是当前的状态，其中player是要下的选手的颜色
@@ -32,8 +35,8 @@ class MonteCarlo(object):
         now=datetime.datetime.utcnow()
         while (datetime.datetime.utcnow()-now) <self.max_times:
             self.Treepolicy(children,valid,count,reverse)
-        print(children)
-        print(self.total_time)
+        #print(children)
+        #print(self.total_time)
         value,child=max((children[p][1]/children[p][0],p) for p in children)
         return child
 # 将下一步所有合法步数传给Treepolicy
