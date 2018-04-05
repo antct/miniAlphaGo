@@ -17,12 +17,13 @@ from math import sqrt,log
 montecarlo class 传的参数中的game的player 为要下棋的选手
 UCTSearch 返回 下一步的最好的棋布
 '''
+
 class MonteCarlo(object):
     def __init__(self,game):
         self.game=game#传的game是当前的状态，其中player是要下的选手的颜色
         self.board=game.board
         self.player=game.player#当前的player
-        self.max_times=datetime.timedelta(seconds=2)
+        self.max_times=datetime.timedelta(seconds=1)
         self.max_move=60
         self.state=0
         self.simulate_times=20
@@ -35,8 +36,11 @@ class MonteCarlo(object):
         now=datetime.datetime.utcnow()
         while (datetime.datetime.utcnow()-now) <self.max_times:
             self.Treepolicy(children,valid,count,reverse)
-        #print(children)
-        #print(self.total_time)
+        print(children)
+        print(self.total_time)
+        for p in children:
+            children[p][1]=children[p][1]/base.weight[p[0]][p[1]]
+        print(children)
         value,child=max((children[p][1]/children[p][0],p) for p in children)
         return child
 # 将下一步所有合法步数传给Treepolicy
@@ -111,6 +115,7 @@ def Flip(board,color,step,valid,count,reverse):
     board.matrix[step[0]][step[1]] = color            
     
 #调试入口
-#mytestobj=game()
-#myMC=MonteCarlo(mytestobj)
-#myMC.UctSearch()
+mytestobj=game()
+myMC=MonteCarlo(mytestobj)
+a=myMC.UctSearch()
+print(a)
