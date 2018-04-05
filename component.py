@@ -3,7 +3,60 @@ from pygame.locals import *
 import base
 import time
 
+def Winner(matrix):
+    black = 0
+    white = 0
+    for i in range(8):
+        for j in range(8):
+            if not matrix[i][j] == base.none :
+                if matrix[i][j] == base.black:
+                    black += 1
+                else:
+                    white += 1
 
+    if black > white:
+        return base.black
+    elif black < white:
+        return base.white
+    else:
+        return base.tie
+
+#judge the next legal steps
+def check(color,board):
+        aim_color = base.black if color == base.white else base.white
+        valid = []
+        count = []
+        reverse = []
+        for i in range(8):
+            for j in range(8):
+                if board.matrix[i][j] != base.none:
+                    continue
+                find_flag = False
+                total_count = 0
+                flip_list = []
+                for k in range(8):
+                    flip_save = flip_list.copy()
+                    x = i + base.direction[k][0]
+                    y = j + base.direction[k][1]
+                    flip_count = 0
+                    while 0 <= x <= 7 and 0 <= y <= 7 and board.matrix[x][y] == aim_color:
+                        flip_list.append((x, y))
+                        x += base.direction[k][0]
+                        y += base.direction[k][1]
+                        flip_count += 1
+                    if x == i + base.direction[k][0] and y == j + base.direction[k][1]:
+                        continue
+                    if x < 0 or x > 7 or y < 0 or y > 7 or board.matrix[x][y] == base.none:
+                        flip_list = flip_save
+                        continue
+                    find_flag = True
+                    total_count += flip_count
+                if find_flag is True:
+                    valid.append((i, j))
+                    count.append(total_count)
+                    reverse.append(flip_list)
+        return valid, count, reverse 
+    
 class player(object):
     def __init__(self, color, mode):
         self.color = color
@@ -103,53 +156,26 @@ class game(object):
                     text_rect.center = (
                         base.board_x + (i + 0.5) * base.cell_width - 2, base.board_y + (j + 0.5) * base.cell_height - 4)
                     self.surface.blit(text, text_rect)
+    
+    
+    
 
-    def check(self):
-        aim_color = base.black if self.player.color == base.white else base.white
-        valid = []
-        count = []
-        reverse = []
-        for i in range(8):
-            for j in range(8):
-                if self.board.matrix[i][j] != base.none:
-                    continue
-                find_flag = False
-                total_count = 0
-                flip_list = []
-                for k in range(8):
-                    flip_save = flip_list.copy()
-                    x = i + base.direction[k][0]
-                    y = j + base.direction[k][1]
-                    flip_count = 0
-                    while 0 <= x <= 7 and 0 <= y <= 7 and self.board.matrix[x][y] == aim_color:
-                        flip_list.append((x, y))
-                        x += base.direction[k][0]
-                        y += base.direction[k][1]
-                        flip_count += 1
-                    if x == i + base.direction[k][0] and y == j + base.direction[k][1]:
-                        continue
-                    if x < 0 or x > 7 or y < 0 or y > 7 or self.board.matrix[x][y] == base.none:
-                        flip_list = flip_save
-                        continue
-                    find_flag = True
-                    total_count += flip_count
-                if find_flag is True:
-                    valid.append((i, j))
-                    count.append(total_count)
-                    reverse.append(flip_list)
-        return valid, count, reverse
+    def quit(self):
+            pygame.quit()
+            sys.exit()
+
 
     def run(self):
-        valid, count, reverse = self.check()
+        valid, count, reverse = check(self.player.color,self.board)
         black, white = self.cal()
         base.total_start = self.player.time = time.time()
         while True:
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    quit()
+                    self.quit()
                 if event.type == MOUSEBUTTONDOWN and event.button == 1:
                     x, y = pygame.mouse.get_pos()
-                    valid, count, reverse = self.check()
+                    valid, count, reverse = check(self.player.color,self.board)
                     row = int((x - base.board_x) / base.cell_width)
                     col = int((y - base.board_y) / base.cell_height)
                     if row < 0 or row > 7 or col < 0 or col > 7 or self.board.matrix[row][col] != base.none or (
@@ -164,7 +190,7 @@ class game(object):
                     self.turn()
 
                     self.player.time = time.time()
-                    valid, count, reverse = self.check()
+                    valid, count, reverse = check(self.player.color,self.board)
                     black, white = self.cal()
 
             x, y = pygame.mouse.get_pos()
@@ -174,7 +200,6 @@ class game(object):
 
             pygame.display.update()
             base.clock.tick(40)
-
-    def quit(self):
-        pygame.quit()
-        sys.exit()
+            
+    
+    

@@ -18,7 +18,7 @@ board_x, board_y = 39, 38
 black = "black"
 white = "white"
 none = "none"
-
+tie="tie"
 man = "man"
 ai = "ai"
 
