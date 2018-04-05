@@ -10,16 +10,21 @@ import datetime
 import copy
 import random
 import base
+from math import sqrt,log
+
+
 
 class MonteCarlo(object):
     def __init__(self,game):
-        self.game=game#传的game是当前的状态
+        self.game=game#传的game是当前的状态，其中player是要下的选手的颜色
         self.board=game.board
         self.player=game.player#当前的player
-        self.max_times=datetime.timedelta(seconds=60)
+        self.max_times=datetime.timedelta(seconds=2)
         self.max_move=60
         self.state=0
-        self.simulate_times=2
+        self.simulate_times=20
+        self.total_time=0#N(v)
+        self.c=0.5
     def UctSearch(self):
         valid, count, reverse=check(self.player.color,self.board)
         #key 值为 合法棋步，value为list，其中list[0]为N，即访问的次数 list[1]为 Q，即reward
@@ -27,35 +32,60 @@ class MonteCarlo(object):
         now=datetime.datetime.utcnow()
         while (datetime.datetime.utcnow()-now) <self.max_times:
             self.Treepolicy(children,valid,count,reverse)
+        print(children)
+        print(self.total_time)
+        value,child=max((children[p][1]/children[p][0],p) for p in children)
+        return child
 # 将下一步所有合法步数传给Treepolicy
     def Treepolicy(self,children,valid,count, reverse):
+        flag=False
         
         if not children:#当前棋手无合法步走
             self.state+=1
             return 
+        #如果没有fully expanded
         for child in children:
-            #如果没有fully expanded
-            if not chidren[child]:
-                i=0
+            if not children[child]:
+                flag=True
                 children[child].append(self.simulate_times)
+                self.total_time+=self.simulate_times
                 Qv=0
                 #选定下一步
-                #cur_color是下一步要下的颜色
-                cur_color = base.black if self.player.color == base.white else base.white
                 cur_board=board()
                 cur_board.matrix=copy.deepcopy(self.board.matrix.copy())
-                flip(cur_board,cur_color,child,valid,count,reverse)
+                Flip(cur_board,self.player.color,child,valid,count,reverse)
                 
-                while(i<=self.simulate_times):
-                    if self.player.color ==self.Simulate(cur_color,cur_board):
-                        Qv+=1
-                    i+=1
+                for i in range(self.simulate_times):
+                    if self.player.color ==self.Simulate(self.player.color,cur_board):
+                        Qv+=1 
                 children[child].append(Qv)
-                
-    def Simulate(color,board):
+            else:
+                break
+        if(flag):
+            return
+        else:
+            #由flag可以确定已经将子节点遍历了一遍，即fully expanded
+            #UCT 策略 BestChild
+            value,child=max((children[p][1]/children[p][0]+self.c*sqrt(2*log(self.total_time)/children[p][0]),p) for p in children)
+            print(children)
+            print(child)
+            cur_board=board()
+            cur_board.matrix=copy.deepcopy(self.board.matrix.copy())
+            Flip(cur_board,self.player.color,child,valid,count,reverse)
+            Qv=0
+            for i in range(self.simulate_times):
+                if self.player.color ==self.Simulate(self.player.color,cur_board):
+                    Qv+=1 
+            self.total_time+=self.simulate_times
+            children[child][0]+=self.simulate_times
+            children[child][1]+=Qv
+            return
+            
+    def Simulate(self,color,cur_board):
         #color是下过的即上一步的颜色
         noMove=0
-       
+        board()
+        board.matrix=copy.deepcopy(cur_board.matrix)
         while True:
             #下一步要下的颜色
             color = base.black if color == base.white else base.white
@@ -76,4 +106,8 @@ def Flip(board,color,step,valid,count,reverse):
     for i, j in flip:
         board.matrix[i][j] = base.black if board.matrix[i][j] == base.white else base.white
     board.matrix[step[0]][step[1]] = color            
-                
+    
+#调试入口
+#mytestobj=game()
+#myMC=MonteCarlo(mytestobj)
+#myMC.UctSearch()
