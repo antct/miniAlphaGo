@@ -36,11 +36,11 @@ class MonteCarlo(object):
         now=datetime.datetime.utcnow()
         while (datetime.datetime.utcnow()-now) <self.max_times:
             self.Treepolicy(children,valid,count,reverse)
-        print(children)
-        print(self.total_time)
+        #print(children)
+        #print(self.total_time)
         for p in children:
             children[p][1]=children[p][1]/base.weight[p[0]][p[1]]
-        print(children)
+        #print(children)
         value,child=max((children[p][1]/children[p][0],p) for p in children)
         return child
 # 将下一步所有合法步数传给Treepolicy
