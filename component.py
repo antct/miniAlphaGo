@@ -20,6 +20,7 @@ def Winner(matrix):
         return base.white
     else:
         return base.tie
+  
 
 #judge the next legal steps
 def check(color,board):
