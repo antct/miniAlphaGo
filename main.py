@@ -1,4 +1,4 @@
-import component
+import entry
 
-main = component.game()
+main = entry.game()
 main.run()

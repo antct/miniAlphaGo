@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
+from base import *
 import datetime
 import copy
 import random
 import base
-import entry
 from math import sqrt, log
 
 '''
@@ -12,7 +11,7 @@ UCTSearch 返回 下一步的最好的棋布
 '''
 
 
-class monte_carlo(object):
+class MonteCarlo(object):
     def __init__(self, game):
         self.game = game  # 传的game是当前的状态，其中player是要下的选手的颜色
         self.board = game.board
@@ -24,13 +23,13 @@ class monte_carlo(object):
         self.total_time = 0  # N(v)
         self.c = 0.5
 
-    def uct_search(self):
-        valid, count, reverse = base.board.check(self.player.color, self.board)
+    def UctSearch(self):
+        valid, count, reverse = board.check(self.player.color, self.board)
         # key 值为 合法棋步，value为list，其中list[0]为N，即访问的次数 list[1]为 Q，即reward
         children = {p: [] for p in valid}
         now = datetime.datetime.utcnow()
         while (datetime.datetime.utcnow() - now) < self.max_times:
-            self.__tree_policy(children, valid, count, reverse)
+            self.Treepolicy(children, valid, count, reverse)
         # print(children)
         # print(self.total_time)
         for p in children:
@@ -39,22 +38,14 @@ class monte_carlo(object):
         value, child = max((children[p][1] / children[p][0], p) for p in children)
         return child
 
-    @staticmethod
-    def __flip(cur_board, color, step, valid, count, reverse):
-        index = valid.index(step)
-        flip = reverse[index]
-        for i, j in flip:
-            cur_board.matrix[i][j] = base.black if cur_board.matrix[i][j] == base.white else base.white
-            cur_board.matrix[step[0]][step[1]] = color
-
-    def __tree_policy(self, children, valid, count, reverse):
+    # 将下一步所有合法步数传给Treepolicy
+    def Treepolicy(self, children, valid, count, reverse):
         flag = False
 
         if not children:  # 当前棋手无合法步走
-            self.state += 1 # 0: 1: 2:
+            self.state += 1
             return
-
-        # 如果没有fully expanded
+            # 如果没有fully expanded
         for child in children:
             if not children[child]:
                 flag = True
@@ -62,19 +53,17 @@ class monte_carlo(object):
                 self.total_time += self.simulate_times
                 Qv = 0
                 # 选定下一步
-                cur_board = base.board()
+                cur_board = board()
                 cur_board.matrix = copy.deepcopy(self.board.matrix.copy())
-                monte_carlo.__flip(cur_board, self.player.color, child, valid, count, reverse)
+                Flip(cur_board, self.player.color, child, valid, count, reverse)
 
                 for i in range(self.simulate_times):
-                    if self.player.color == self.__simulate(self.player.color, cur_board):
+                    if self.player.color == self.Simulate(self.player.color, cur_board):
                         Qv += 1
-
                 children[child].append(Qv)
             else:
                 break
-
-        if flag:
+        if (flag):
             return
         else:
             # 由flag可以确定已经将子节点遍历了一遍，即fully expanded
@@ -84,38 +73,42 @@ class monte_carlo(object):
                 children)
             print(children)
             print(child)
-            cur_board = base.board()
+            cur_board = board()
             cur_board.matrix = copy.deepcopy(self.board.matrix.copy())
-            monte_carlo.__flip(cur_board, self.player.color, child, valid, count, reverse)
+            Flip(cur_board, self.player.color, child, valid, count, reverse)
             Qv = 0
             for i in range(self.simulate_times):
-                if self.player.color == self.__simulate(self.player.color, cur_board):
+                if self.player.color == self.Simulate(self.player.color, cur_board):
                     Qv += 1
             self.total_time += self.simulate_times
             children[child][0] += self.simulate_times
             children[child][1] += Qv
+
             return
 
-    def __simulate(self, color, cur_board):
+    def Simulate(self, color, cur_board):
         # color是下过的即上一步的颜色
         noMove = 0
-        tmp_board = base.board()
-        tmp_board.matrix = copy.deepcopy(cur_board.matrix)
+        board()
+        board.matrix = copy.deepcopy(cur_board.matrix)
         while True:
             # 下一步要下的颜色
             color = base.black if color == base.white else base.white
-            valid, count, reverse = base.board.check(color, tmp_board)
+            valid, count, reverse = board.check(color, board)
             if not valid:
                 noMove += 1
                 if noMove == 2:
-                    return base.board.winner(tmp_board)
+                    return board.winner(board)
+
             else:
                 step = random.choice(valid)
-                monte_carlo.__flip(tmp_board, color, step, valid, count, reverse)
+                Flip(board, color, step, valid, count, reverse)
                 noMove = 0
 
-# 调试入口
-# mytestobj = entry.game()
-# myMC = monte_carlo(mytestobj)
-# a = myMC.uct_search()
-# print(a)
+
+def Flip(board, color, step, valid, count, reverse):
+    index = valid.index(step)
+    flip = reverse[index]
+    for i, j in flip:
+        board.matrix[i][j] = base.black if board.matrix[i][j] == base.white else base.white
+    board.matrix[step[0]][step[1]] = color
