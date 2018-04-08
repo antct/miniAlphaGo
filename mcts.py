@@ -37,6 +37,7 @@ class monte_carlo(object):
             children[p][1] = children[p][1] / base.weight[p[0]][p[1]]
         # print(children)
         value, child = max((children[p][1] / children[p][0], p) for p in children)
+        print(str(child)+": "+str(value))
         return child
 
     @staticmethod
@@ -51,7 +52,7 @@ class monte_carlo(object):
         flag = False
 
         if not children:  # 当前棋手无合法步走
-            self.state += 1 # 0: 1: 2:
+            self.state += 1  # 0: 1: 2:
             return
 
         # 如果没有fully expanded
@@ -82,8 +83,6 @@ class monte_carlo(object):
             value, child = max(
                 (children[p][1] / children[p][0] + self.c * sqrt(2 * log(self.total_time) / children[p][0]), p) for p in
                 children)
-            print(children)
-            print(child)
             cur_board = base.board()
             cur_board.matrix = copy.deepcopy(self.board.matrix.copy())
             monte_carlo.__flip(cur_board, self.player.color, child, valid, count, reverse)
@@ -114,8 +113,17 @@ class monte_carlo(object):
                 monte_carlo.__flip(tmp_board, color, step, valid, count, reverse)
                 noMove = 0
 
-# 调试入口
-# mytestobj = entry.game()
-# myMC = monte_carlo(mytestobj)
-# a = myMC.uct_search()
-# print(a)
+
+import threading
+
+class mcts_thread(threading.Thread):
+    def __init__(self, game):
+        threading.Thread.__init__(self)
+        self.mcts = monte_carlo(game)
+        self.result = 0, 0
+
+    def run(self):
+        self.result = self.mcts.uct_search()
+
+    def get_result(self):
+        return self.result

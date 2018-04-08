@@ -57,18 +57,18 @@ class board(object):
 
     @staticmethod
     def winner(board):
-        black = 0
-        white = 0
+        black_num = 0
+        white_num = 0
         for i in range(8):
             for j in range(8):
                 if not board.matrix[i][j] == none:
                     if board.matrix[i][j] == black:
-                        black += 1
+                        black_num += 1
                     else:
-                        white += 1
-        if black > white:
+                        white_num += 1
+        if black_num > white_num:
             return black
-        elif black < white:
+        elif black_num < white_num:
             return white
         else:
             return tie
