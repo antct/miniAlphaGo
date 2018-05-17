@@ -21,6 +21,7 @@ none = "none"
 tie = "tie"
 man = "man"
 ai = "ai"
+# inf=1000
 
 total_start, total_end = 0, 0
 
@@ -42,6 +43,9 @@ weight = [[1, 5, 3, 3, 3, 3, 5, 1],
           [5, 5, 4, 4, 4, 4, 5, 5],
           [1, 5, 3, 3, 3, 3, 5, 1]]
 
+winnertest = []
+flag = False
+
 
 class player(object):
     def __init__(self, color, mode):
@@ -62,7 +66,7 @@ class board(object):
         self.matrix[4][4] = black
 
     @staticmethod
-    def winner(board):
+    def winner(board, color):
         black_num = 0
         white_num = 0
         for i in range(8):
@@ -72,12 +76,29 @@ class board(object):
                         black_num += 1
                     else:
                         white_num += 1
-        if black_num > white_num:
-            return black
-        elif black_num < white_num:
-            return white
+        # print("winner",black_num,white_num)
+        if winnertest.count((black_num, white_num)) > 0:
+            global flag
+            flag = True
         else:
-            return tie
+            winnertest.append((black_num, white_num))
+        # if black_num+white_num<40:
+        # print(board.matrix)
+        if color == black:
+            if black_num > white_num:
+                return 1
+            elif white_num > black_num:
+                return 0
+            else:
+                return 0.5
+        else:
+            # print("winner error")
+            if black_num > white_num:
+                return -1
+            elif white_num > black_num:
+                return 1
+            else:
+                return 0
 
     @staticmethod
     def check(color, board):

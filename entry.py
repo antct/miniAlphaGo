@@ -136,6 +136,7 @@ class game(object):
                     if flag:
                         break
             else:
+                
                 mt = mcts.mcts_thread(self)
                 mt.setDaemon(True)
                 mt.start()
@@ -145,6 +146,9 @@ class game(object):
                             self.quit()
                     self.__update()
                 next_row, next_col = mt.get_result()
+
+                # mt = mcts.monte_carlo(self)
+                # next_row, next_col = mt.uct_search()
 
             self.__flip(next_row, next_col)
             self.__turn()
