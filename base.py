@@ -60,10 +60,10 @@ class board(object):
         self.matrix = []
         for i in range(8):
             self.matrix.append([none] * 8)
-        self.matrix[3][3] = black
-        self.matrix[3][4] = white
-        self.matrix[4][3] = white
-        self.matrix[4][4] = black
+        self.matrix[3][3] = white
+        self.matrix[3][4] = black
+        self.matrix[4][3] = black
+        self.matrix[4][4] = white
 
     @staticmethod
     def winner(board, color):
