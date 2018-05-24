@@ -84,7 +84,7 @@ class monte_carlo(object):
         self.simulate_board = base.board()
         self.player = game.player
         self.simulate_player = base.player(game.player.color, game.player.mode)
-        self.max_times = datetime.timedelta(seconds=3)
+        self.max_times = datetime.timedelta(seconds=10)
         self.max_move = 60
         self.state = 0
         # self.simulate_times = 20
@@ -102,21 +102,21 @@ class monte_carlo(object):
     def uct_search(self):
         # create root node
         root = tree_node(self.player.color, self.board)
-        print("root", root.color)
+        #print("root", root.color)
 
         now = datetime.datetime.utcnow()
-        i = 1000
+        #i = 1000
         # node=self.__tree_policy(root)
-        # while (datetime.datetime.utcnow() - now) < self.max_times:
-        while i > 0:
+        while (datetime.datetime.utcnow() - now) < self.max_times:
+        #while i > 0:
             node = self.__tree_policy(root)
             # print(node.move)
             delta = self.__simulate(node)
             # print(delta)
             self.__backup(node, delta)
-            i = i - 1
-        print()
-        print()
+            #i = i - 1
+        #print()
+        #print()
         # print("winnertest")
         # print(base.winnertest)
         # print("ending",child.move)

@@ -8,11 +8,18 @@ import mcts
 
 class game(object):
     def __init__(self):
+        #print(sys.argv[1])
         self.surface = pygame.display.set_mode((base.board_rect.width, base.board_rect.height))
         self.over = False
         self.board = base.board()
-        self.player1 = base.player(base.black, base.man)
-        self.player2 = base.player(base.white, base.ai)
+        if sys.argv[1]=='man':
+            print("man")
+            self.player1 = base.player(base.black, base.man)
+            self.player2 = base.player(base.white, base.ai)
+        else:
+            print("ai")
+            self.player1 = base.player(base.black, base.ai)
+            self.player2 = base.player(base.white, base.man)
         self.player = self.player1
 
     def __turn(self):
@@ -146,7 +153,7 @@ class game(object):
                             self.quit()
                     self.__update()
                 next_row, next_col = mt.get_result()
-
+                print("final calculated step: 行： 列：" ,next_col,next_row)
                 # mt = mcts.monte_carlo(self)
                 # next_row, next_col = mt.uct_search()
 
